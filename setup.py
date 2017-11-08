@@ -2,6 +2,7 @@
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
+import os
 import sys
 import setuptools
 
@@ -24,13 +25,17 @@ class get_pybind_include(object):
 
 ext_modules = [
     Extension(
-        'python_example',
+        'opentracing_cpp',
         ['src/bindings.cpp'],
         include_dirs=[
-            # Path to pybind11 headers
             get_pybind_include(),
-            get_pybind_include(user=True)
+            get_pybind_include(user=True),
+            os.path.join(os.path.dirname(__file__),
+                         'opentracing-cpp/install/include')
         ],
+        libraries=['opentracing'],
+        library_dirs=[os.path.join(os.path.dirname(__file__),
+                                   'opentracing-cpp/install/lib')],
         language='c++'
     ),
 ]
@@ -90,7 +95,7 @@ class BuildExt(build_ext):
         build_ext.build_extensions(self)
 
 setup(
-    name='opentracing_cpp_python',
+    name='opentracing_cpp',
     version=__version__,
     author='Isaac Hier',
     author_email='isaachier@gmail.com',
