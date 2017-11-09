@@ -34,6 +34,7 @@ std::string systemTimestamp(const opentracing::SystemClock::time_point& time)
 
 PYBIND11_MODULE(opentracing_cpp, m) {
     using namespace opentracing;
+
     py::class_<SpanContext>(m, "SpanContext")
         .def("baggage", [](const SpanContext& sc) {
             std::unordered_map<std::string, std::string> baggage;
@@ -65,9 +66,12 @@ PYBIND11_MODULE(opentracing_cpp, m) {
         .def("log_kv", [](Span& span,
                           py::dict keyValues,
                           py::object timestamp) {
+            // TODO: Once API allows for logging a dynamic collection, remove
+            // this loop and make a single call to `Span::Log`
+            // (see https://github.com/opentracing/opentracing-cpp/issues/35).
             for (auto&& pair : keyValues) {
-                span.Log({{ py::cast<std::string>(pair.first),
-                            Value(py::cast<std::string>(pair.second)) }});
+                span.Log({{ std::string(py::str(pair.first)),
+                            Value(py::str(pair.second)) }});
             }
             const auto logTime =
                 timestampFromPyFloat<SystemClock>(timestamp);
