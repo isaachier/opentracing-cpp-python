@@ -26,16 +26,20 @@ class get_pybind_include(object):
 ext_modules = [
     Extension(
         'opentracing_cpp',
-        ['src/bindings.cpp'],
+        ['src/bindings.cpp',
+         'opentracing-cpp/src/noop.cpp',
+         'opentracing-cpp/src/propagation.cpp',
+         'opentracing-cpp/src/tracer.cpp'],
         include_dirs=[
             get_pybind_include(),
             get_pybind_include(user=True),
             os.path.join(os.path.dirname(__file__),
-                         'opentracing-cpp/install/include')
+                         'opentracing-cpp/include'),
+            os.path.join(os.path.dirname(__file__),
+                         'opentracing-cpp/3rd_party/include'),
+            os.path.join(os.path.dirname(__file__),
+                         'opentracing-cpp/build/include'),
         ],
-        libraries=['opentracing'],
-        library_dirs=[os.path.join(os.path.dirname(__file__),
-                                   'opentracing-cpp/install/lib')],
         language='c++'
     ),
 ]
